@@ -3,6 +3,9 @@ package com.log.capital.trial.client;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.net.URI;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -72,11 +75,14 @@ public class TelegramCloneClient extends JFrame {
         add(splitPane);
     }
 
-    public void connectWebSocket() {
+    public void connectWebSocket(String username, String password) {
         try {
-            URI serverUri = new URI("ws://localhost:8080/chat-server"); 
-            
-            client = new WebSocketClient(serverUri) {
+            URI serverUri = new URI("ws://localhost:8080/chat-server");
+            String auth = username +":" + password;
+            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+            Map<String, String> headers = new HashMap<>();
+            headers.put("Authorization", "Basic " + encodedAuth);
+            client = new WebSocketClient(serverUri, headers) {
                 @Override
                 public void onOpen(ServerHandshake handshakedata) {
                         send("CONNECT\naccept-version:1.1,1.2\nheart-beat:10000,10000\n\n\u0000");
@@ -129,7 +135,7 @@ public class TelegramCloneClient extends JFrame {
             loginDlg.setVisible(true);
 
             if (loginDlg.isSucceeded()) {
-                mainFrame.connectWebSocket();
+                mainFrame.connectWebSocket(loginDlg.getUsername(), loginDlg.getPassword());
                 mainFrame.setVisible(true);
             } else {
                 System.exit(0);
