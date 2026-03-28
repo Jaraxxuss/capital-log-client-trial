@@ -92,7 +92,7 @@ public class TelegramCloneClient extends JFrame {
 
                 @Override
                 public void onClose(int code, String reason, boolean remote) {
-                    System.out.println("Соединение закрыто");
+                    System.out.println("Соединение закрыто: " + reason + "code: " + code);
                 }
 
                 @Override
