@@ -6,6 +6,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.Base64;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -67,9 +73,27 @@ public class LoginDialog extends JDialog {
         setLocationRelativeTo(parent);
     }
 
-    // todo: call auth api
     private boolean authenticate(String user, String pass) {
-        return !user.isEmpty() && !pass.isEmpty();
+        try {
+            String auth = user + ":" + pass;
+            String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes());
+
+            HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(5))
+                    .build();
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("http://localhost:8080/api/auth/me")) // Наш новый эндпоинт
+                    .header("Authorization", "Basic " + encodedAuth)
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            return response.statusCode() == 200;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public String getUsername() { return usernameField.getText().trim(); }
