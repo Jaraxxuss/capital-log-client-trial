@@ -23,6 +23,9 @@ dependencies {
 
     // This dependency is used by the application.
     implementation libs.guava
+    implementation libs.formdev
+    implementation libs.java.websocket
+    
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -34,7 +37,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'com.log.capital.trial.client.App'
+    mainClass = 'com.log.capital.trial.client.TelegramCloneClient'
 }
 
 tasks.named('test') {
